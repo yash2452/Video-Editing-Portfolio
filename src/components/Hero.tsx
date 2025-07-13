@@ -1,91 +1,68 @@
 import { Button } from "@/components/ui/button";
-import VideoPlayer from "./VideoPlayer";
-import YouTubePlayer from "./YouTubePlayer";
 import SoftwareIcon from "./SoftwareIcons";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
-import { useAnimationSettings } from "@/hooks/useAnimationSettings";
+import YouTubePlayer from "react-player/youtube";
 
 const Hero = () => {
   const { profileData, showreelVideo } = usePortfolioData();
-  const { settings } = useAnimationSettings();
-
-  const scrollToContact = () => {
-    const element = document.getElementById('contact');
-    element?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const scrollToProjects = () => {
-    const element = document.getElementById('projects');
-    element?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const softwareIcons = [
-    { name: "Adobe Premiere Pro", key: "premiere" as const },
-    { name: "Adobe After Effects", key: "aftereffects" as const },
-    { name: "DaVinci Resolve", key: "davinci" as const },
-    { name: "Adobe Photoshop", key: "photoshop" as const },
-    { name: "Adobe Illustrator", key: "illustrator" as const },
-    { name: "Adobe Audition", key: "audition" as const },
+    { name: "premiere", label: "Premiere Pro" },
+    { name: "aftereffects", label: "After Effects" },
+    { name: "davinci", label: "DaVinci Resolve" },
+    { name: "photoshop", label: "Photoshop" },
+    { name: "illustrator", label: "Illustrator" },
+    { name: "audition", label: "Audition" },
+    { name: "figma", label: "Figma" }, // Added Figma icon
   ];
 
-  const getBackgroundAnimation = () => {
-    if (!settings.enableSwirls || settings.backgroundAnimation === 'none') return null;
-    
-    return (
-      <div className="absolute inset-0 pointer-events-none">
-        <svg className="absolute w-full h-full" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" style={{ opacity: settings.swirlOpacity }}>
-          <defs>
-            <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.6" />
-              <stop offset="50%" stopColor="#8b5cf6" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#a855f7" stopOpacity="0.6" />
-            </linearGradient>
-            <linearGradient id="gradient2" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.5" />
-              <stop offset="50%" stopColor="#6366f1" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.5" />
-            </linearGradient>
-          </defs>
-          
-          <path 
-            d="M100,500 Q300,100 500,500 T900,500" 
-            fill="none" 
-            stroke="url(#gradient1)" 
-            strokeWidth="3"
-            className="animate-pulse"
-            style={{
-              animation: `swirl1 ${settings.swirlSpeed}s ease-in-out infinite`,
-              transformOrigin: 'center'
-            }}
-          />
-          <path 
-            d="M200,300 Q500,700 800,300 T400,300" 
-            fill="none" 
-            stroke="url(#gradient2)" 
-            strokeWidth="2"
-            style={{
-              animation: `swirl2 ${settings.swirlSpeed + 4}s ease-in-out infinite reverse`,
-              transformOrigin: 'center'
-            }}
-          />
-          <path 
-            d="M50,700 Q400,200 750,700 T950,400" 
-            fill="none" 
-            stroke="url(#gradient1)" 
-            strokeWidth="2"
-            opacity="0.7"
-            style={{
-              animation: `swirl3 ${settings.swirlSpeed + 2}s ease-in-out infinite`,
-              transformOrigin: 'center'
-            }}
-          />
-        </svg>
+  return (
+    <section id="home" className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-extrabold text-white mb-6">
+            Hi, I'm{" "}
+            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              {profileData.name}
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 leading-relaxed mb-8">{profileData.bio}</p>
+        </div>
+
+        {/* Tools Marquee */}
+        <div className="overflow-hidden">
+          <div className="flex gap-8 animate-marquee">
+            {softwareIcons.map((tool, index) => (
+              <div key={index} className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg shadow-lg">
+                <SoftwareIcon name={tool.name} size={32} />
+                <span className="text-white text-sm">{tool.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    );
-  };
+
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+          display: flex;
+          animation: marquee 20s linear infinite;
+        }
+      `}</style>
+    </section>
+  );
+};
+
+export default Hero;
+      </div>
+    </div>
+  );
 
   return (
-    <section id="home" className="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+    <section id="home" className="py-20 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
       {getBackgroundAnimation()}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -98,7 +75,7 @@ const Hero = () => {
             
             <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-indigo-500 shadow-2xl relative z-10">
               <img 
-                src="/lovable-uploads/a0f6e820-7356-4480-8442-bcfd661d6ba7.png" 
+                src="/img/profile.png"  // Updated path to match your public/img folder structure
                 alt="Profile" 
                 className="w-full h-full object-cover"
               />
@@ -140,10 +117,17 @@ const Hero = () => {
           <div className="max-w-5xl mx-auto">
             <h2 className="text-3xl font-bold text-center text-white mb-8">Featured Showreel</h2>
             <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gray-800">
-              <YouTubePlayer
-                videoId="https://www.youtube.com/watch?v=-dr-wvPjGFo"
-                className="w-full aspect-video"
-              />
+              {showreelVideo ? (
+                <YouTubePlayer
+                  videoId={showreelVideo.url}
+                  className="w-full aspect-video"
+                  title="Featured Showreel"
+                />
+              ) : (
+                <div className="flex items-center justify-center w-full h-full text-gray-500">
+                  No video available
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -208,4 +192,3 @@ const Hero = () => {
 };
 
 export default Hero;
-            

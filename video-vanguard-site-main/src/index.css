@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Portfolio Design System - Modern, Professional Video Editor Theme */
+
+@layer base {
+  :root {
+    /* Darker aesthetic theme */
+    --background: 210 11% 6%;
+    --foreground: 210 20% 96%;
+
+    --card: 210 11% 8%;
+    --card-foreground: 210 20% 96%;
+
+    --popover: 210 11% 12%;
+    --popover-foreground: 210 20% 95%;
+
+    /* Vibrant primary - electric blue */
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 20% 5%;
+    --primary-glow: 217 91% 70%;
+
+    /* Subtle secondary */
+    --secondary: 210 11% 15%;
+    --secondary-foreground: 210 20% 85%;
+
+    --muted: 210 11% 15%;
+    --muted-foreground: 210 10% 60%;
+
+    /* Vibrant accent - purple */
+    --accent: 271 81% 56%;
+    --accent-foreground: 210 20% 95%;
+    --accent-glow: 271 81% 66%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 210 20% 95%;
+
+    --border: 210 11% 20%;
+    --input: 210 11% 15%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.75rem;
+
+    /* Video player specific */
+    --video-bg: 210 11% 8%;
+    --video-overlay: 210 11% 5%;
+
+    /* Custom gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));
+    --gradient-dark: linear-gradient(135deg, hsl(var(--background)), hsl(var(--card)));
+    --gradient-hero: linear-gradient(135deg, hsl(210 11% 9%), hsl(210 11% 12%), hsl(217 91% 20%));
+
+    /* Shadows */
+    --shadow-primary: 0 10px 30px -10px hsl(var(--primary) / 0.3);
+    --shadow-accent: 0 10px 30px -10px hsl(var(--accent) / 0.3);
+    --shadow-card: 0 8px 25px -8px hsl(210 11% 5% / 0.4);
+    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.2);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-medium;
+    font-family: 'Inter', sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Hero button variants */
+  .btn-hero {
+    @apply bg-primary hover:bg-primary-glow text-primary-foreground font-semibold px-8 py-4 rounded-full;
+    @apply transform transition-all duration-300 hover:scale-105 hover:shadow-lg;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-primary);
+  }
+
+  .btn-secondary {
+    @apply bg-accent hover:bg-accent-glow text-accent-foreground font-semibold px-8 py-4 rounded-full;
+    @apply transform transition-all duration-300 hover:scale-105;
+    background: var(--gradient-accent);
+    box-shadow: var(--shadow-accent);
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    @apply transform transition-all duration-300 hover:-translate-y-2;
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-hover:hover {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Video container */
+  .video-container {
+    @apply bg-video-bg rounded-xl overflow-hidden;
+    background: var(--gradient-dark);
+  }
+
+  /* Glow effects */
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 20px hsl(var(--accent) / 0.3);
+  }
+
+  /* Text gradients */
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-accent {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+@layer utilities {
+  /* Custom keyframes */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.2); }
+    50% { box-shadow: 0 0 30px hsl(var(--primary) / 0.4); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}

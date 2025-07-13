@@ -360,4 +360,6 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
+  useChart,
+  ChartContext,
 }

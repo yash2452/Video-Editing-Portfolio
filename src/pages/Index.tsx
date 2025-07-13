@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Hero from "@/components/Hero";
 import Projects from "@/components/Projects";
@@ -31,37 +30,23 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <Navigation />
-      
-      {/* Admin Toggle - Only visible when not in production */}
-      {process.env.NODE_ENV !== 'production' && (
-        <div className="fixed top-4 right-4 z-50">
-          <Button
-            onClick={handleSettingsClick}
-            variant="outline"
-            size="sm"
-            className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
-      )}
-
-      <AdminLogin 
-        isOpen={showLogin} 
+      <Hero />
+      <Projects />
+      <Contact />
+      <Button
+        onClick={handleSettingsClick}
+        className="fixed bottom-4 right-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg"
+      >
+        <Settings className="h-6 w-6" />
+      </Button>
+      <AdminLogin
+        isOpen={showLogin}
         onClose={() => setShowLogin(false)}
         onSuccess={handleLoginSuccess}
       />
-
       {showAdmin && isAuthenticated && isAdmin && (
         <AdminPanel onClose={() => setShowAdmin(false)} />
       )}
-      
-      <main>
-        <Hero />
-        <Projects />
-        <Contact />
-      </main>
-      
       <Footer />
     </div>
   );
