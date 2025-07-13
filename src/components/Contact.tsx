@@ -1,10 +1,14 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+import { Mail, Calendar, Instagram, Twitter, Linkedin } from "lucide-react";
+import { usePortfolioData } from "@/hooks/usePortfolioData";
 
 const Contact = () => {
+  const { profileData } = usePortfolioData();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -21,7 +25,7 @@ const Contact = () => {
     
     toast({
       title: "Message sent!",
-      description: "Thank you for your message! I'll get back to you soon.",
+      description: "Thank you for your message! Meanwhile, check out my socials below. I'll get back to you soon.",
     });
     
     setFormData({ name: "", email: "", message: "" });
@@ -36,7 +40,7 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-20 bg-gray-900">
+    <section id="contact" className="py-20 bg-gray-800">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-white mb-4">Let's Work Together</h2>

@@ -1,6 +1,6 @@
 header {
-    color: #333333; /* Replace with the font color from video-vanguard-site-main */
-    font-size: 24px; /* Replace with the font size from video-vanguard-site-main */
-    background-color: #000000; /* Set to black for aesthetic look */
-    padding: 10px 20px; /* Adjust padding as needed */  
+    color: #f3f4f6; /* light text for dark bg */
+    font-size: 24px;
+    background-color: #18181b; /* dark background */
+    padding: 10px 20px;
 }

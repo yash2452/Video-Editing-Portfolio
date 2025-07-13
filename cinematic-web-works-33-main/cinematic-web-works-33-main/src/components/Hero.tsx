@@ -25,7 +25,8 @@ const Hero = () => {
     { name: "davinci" as const, label: "DaVinci Resolve" },
     { name: "photoshop" as const, label: "Photoshop" },
     { name: "illustrator" as const, label: "Illustrator" },
-    { name: "audition" as const, label: "Audition" }
+    { name: "audition" as const, label: "Audition" },
+    { name: "figma" as const, label: "Figma", img: "/figma-icon.png" } // Add Figma icon (place /figma-icon.png in public folder)
   ];
 
   const getBackgroundAnimation = () => {
@@ -123,7 +124,7 @@ const Hero = () => {
                 onClick={scrollToContact}
                 className={`bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-${settings.transitionDuration} ${settings.buttonAnimations ? 'transform hover:scale-105' : ''}`}
               >
-                Book a Call
+                Make a Call
               </Button>
               <Button 
                 onClick={scrollToProjects}
@@ -136,15 +137,15 @@ const Hero = () => {
         </div>
 
         {/* Main Showreel */}
-        <div className="mb-16">
+        <div className="mb-26">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-white mb-8">Featured Showreel</h2>
+            <h2 className="text-3xl font-bold text-center text-white mb-8">Showreel</h2>
             <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gray-800">
               {showreelVideo ? (
                 <YouTubePlayer
                   videoId={showreelVideo.url}
                   className="w-full aspect-video"
-                  title="Featured Showreel"
+                  title="Showreel"
                 />
               ) : (
                 <div className="w-full aspect-video bg-gray-800 flex items-center justify-center">
@@ -152,7 +153,7 @@ const Hero = () => {
                     <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-2xl">🎬</span>
                     </div>
-                    <p className="text-gray-400 text-lg">Main Showreel Video</p>
+                    <p className="text-gray-400 text-lg">Showreel Video</p>
                     <p className="text-gray-500 text-sm">Upload your featured video in admin panel</p>
                   </div>
                 </div>
@@ -164,18 +165,39 @@ const Hero = () => {
         {/* Software Icons */}
         <div className="text-center">
           <h3 className="text-2xl font-semibold text-white mb-8">Tools I Use</h3>
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {softwareIcons.map((tool, index) => (
-              <div
-                key={index}
-                className={`w-16 h-16 bg-gray-800/50 rounded-xl flex items-center justify-center shadow-lg ${
-                  settings.enableHoverEffects ? 'transform hover:scale-110' : ''
-                } transition-all duration-${settings.transitionDuration} cursor-pointer p-3`}
-                title={tool.label}
-              >
-                <SoftwareIcon name={tool.name} className="w-full h-full" />
+          <div className="relative w-full max-w-3xl mx-auto h-20 overflow-hidden">
+            {/* Fade overlays for left/right */}
+            <div className="pointer-events-none absolute left-0 top-0 h-full w-24 bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent z-10"></div>
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-gray-900 via-gray-900/80 to-transparent z-10"></div>
+            {/* Marquee */}
+            <div className="absolute inset-0 flex items-center h-full">
+              <div className="marquee flex items-center gap-8">
+                {/* Repeat icons twice for seamless loop */}
+                {[...softwareIcons, ...softwareIcons].map((tool, index) => (
+                  <div
+                    key={index}
+                    className="w-16 h-16 flex items-center justify-center rounded-xl shadow-lg transition-all duration-300 cursor-pointer"
+                    title={tool.label}
+                    style={{
+                      // Fade effect based on position in marquee
+                      opacity: 1,
+                      filter: "none"
+                    }}
+                  >
+                    {tool.name === "figma" ? (
+                      <img
+                        src={tool.img}
+                        alt="Figma icon"
+                        className="w-full h-full object-contain"
+                        style={{ borderRadius: "16px" }}
+                      />
+                    ) : (
+                      <SoftwareIcon name={tool.name} className="w-full h-full" />
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </div>
@@ -216,6 +238,15 @@ const Hero = () => {
             transform: rotate(180deg) scale(0.9) translateY(10px); 
             opacity: 0.6; 
           }
+        }
+
+        .marquee {
+          animation: marquee 18s linear infinite;
+          will-change: transform;
+        }
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
       `}</style>
     </section>

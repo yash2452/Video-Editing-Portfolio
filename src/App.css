@@ -12,8 +12,7 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-  transition: filter 0.3s ease-in-out;
+  filter: drop-shadow(0 0 2em #0e1016);
 }
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
@@ -39,5 +38,5 @@
 }
 
 .read-the-docs {
-  color: #888;
+  color: #d1d5db; /* light gray for dark bg */
 }

@@ -39,16 +39,31 @@ const FormField = <
   )
 }
 
-const FieldContext = React.createContext(null)
-
 const useFormField = () => {
-  const fieldContext = React.useContext(FieldContext)
+  const fieldContext = React.useContext(FormFieldContext)
+  const itemContext = React.useContext(FormItemContext)
+  const { getFieldState, formState } = useFormContext()
+
+  const fieldState = getFieldState(fieldContext.name, formState)
 
   if (!fieldContext) {
     throw new Error("useFormField should be used within <FormField>")
   }
 
-  return fieldContext
+  const { id } = itemContext
+
+  return {
+    id,
+    name: fieldContext.name,
+    formItemId: `${id}-form-item`,
+    formDescriptionId: `${id}-form-item-description`,
+    formMessageId: `${id}-form-item-message`,
+    ...fieldState,
+  }
+}
+
+type FormItemContextValue = {
+  id: string
 }
 
 const FormItemContext = React.createContext<FormItemContextValue>(
@@ -144,21 +159,6 @@ const FormMessage = React.forwardRef<
       {...props}
     >
       {body}
-    </p>
-  )
-})
-FormMessage.displayName = "FormMessage"
-
-export {
-  useFormField,
-  Form,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormDescription,
-  FormMessage,
-  FormField,
-}
     </p>
   )
 })

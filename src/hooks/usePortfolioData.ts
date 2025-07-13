@@ -57,7 +57,7 @@ const defaultLongFormProjects: Project[] = [
     category: "Documentary",
     tags: ["Documentary", "Color Grading", "Audio Sync", "Storytelling"],
     software: ["premiere", "aftereffects", "audition"],
-    youtubeId: "your_video_id_here",
+    youtubeId: "fNh_GyRbJDA&t=7s",
     clientName: "Creative Studios",
     duration: "45 min",
     year: "2024"
@@ -69,7 +69,7 @@ const defaultLongFormProjects: Project[] = [
     category: "Podcast",
     tags: ["Podcast", "Motion Graphics", "B-Roll", "Audio Enhancement"],
     software: ["premiere", "aftereffects", "photoshop"],
-    youtubeId: "https://www.youtube.com/watch?v=Kl-I7sUcAOY",
+    youtubeId: "Kl-I7sUcAOY",
     clientName: "Tech Talk Weekly",
     duration: "25 min",
     year: "2024"
@@ -108,7 +108,7 @@ const defaultShortFormProjects: Project[] = [
     category: "Social Media",
     tags: ["Social Media", "Brand", "Promotional"],
     software: ["premiere", "aftereffects"],
-    youtubeId: "your_video_id_here",
+    youtubeId: "dQw4w9WgXcQ",
     clientName: "Brand Co",
     duration: "60s",
     year: "2024"

@@ -15,34 +15,15 @@ interface AdminPanelProps {
   onClose: () => void;
 }
 
-interface Project {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  videoUrl: string;
-  thumbnail: string;
-  tags: string[];
-  type: "long" | "short";
-  videoType: "youtube" | "vimeo";
-  youtubeId: string;
-}
-
-interface SocialLinks {
-  instagram: string;
-  twitter: string;
-  linkedin: string;
-}
-
 const AdminPanel = ({ onClose }: AdminPanelProps) => {
   const { logout } = useAuth();
-  const {
-    profileData = {},
-    longFormProjects = [],
-    shortFormProjects = [],
-    updateProfile,
-    addProject,
-    deleteProject,
+  const { 
+    profileData, 
+    longFormProjects, 
+    shortFormProjects, 
+    updateProfile, 
+    addProject, 
+    deleteProject 
   } = usePortfolioData();
 
   const [activeTab, setActiveTab] = useState("profile");
@@ -53,13 +34,8 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     videoUrl: "",
     thumbnail: "",
     tags: "",
-    type: "long" as "long" | "short",
-    videoType: "youtube" as "youtube" | "vimeo",
-    youtubeId: ""
+    type: "long" as "long" | "short"
   });
-
-  // Fallback for socials to avoid undefined errors
-  const socials = profileData.socials ?? { instagram: "", twitter: "", linkedin: "" };
 
   const handleLogout = () => {
     logout();
@@ -70,168 +46,69 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     onClose();
   };
 
-  const validateVideoUrl = (url: string): { isValid: boolean; type: "youtube" | "vimeo" | null; id: string } => {
-    const youtubeRegex = /^(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([^#&?]*).*/;
-    const vimeoRegex = /^(?:https?:\/\/)?(?:www\.)?(?:vimeo\.com\/)(\d+)/;
-    
-    const youtubeMatch = url.match(youtubeRegex);
-    const vimeoMatch = url.match(vimeoRegex);
-
-    if (youtubeMatch && youtubeMatch[1]) {
-      return { isValid: true, type: "youtube", id: youtubeMatch[1] };
-    } else if (vimeoMatch && vimeoMatch[1]) {
-      return { isValid: true, type: "vimeo", id: vimeoMatch[1] };
-    }
-    
-    return { isValid: false, type: null, id: "" };
-  };
-
-  const validateSocialUrl = (type: keyof SocialLinks, url: string): boolean => {
-    const patterns = {
-      instagram: /^https?:\/\/(www\.)?instagram\.com\/[a-zA-Z0-9_\.]+\/?$/,
-      twitter: /^https?:\/\/(www\.)?twitter\.com\/[a-zA-Z0-9_]+\/?$/,
-      linkedin: /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9\-]+\/?$/
-    };
-    return patterns[type].test(url);
-  };
-
-  // Add this helper if not present
-  const extractYoutubeId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : '';
-  };
-
   const handleProfileUpdate = (field: string, value: string) => {
-    try {
-      if (!field) throw new Error("Field name is required");
-
-      if (field.includes('.')) {
-        const [parent, child] = field.split('.');
-        if (parent === 'socials') {
-          const socialType = child as keyof SocialLinks;
-          if (!value.trim()) {
-            updateProfile({ 
-              socials: { 
-                ...socials,
-                [child]: '' 
-              } 
-            });
-            toast({
-              title: "Profile Updated",
-              description: `${field} has been updated successfully.`,
-            });
-            return;
-          }
-          if (!validateSocialUrl(socialType, value)) {
-            throw new Error(`Invalid ${socialType} URL format`);
-          }
-          updateProfile({ 
-            socials: { 
-              ...socials,
-              [child]: value.trim()
-            }
-          });
-          toast({
-            title: "Profile Updated",
-            description: `${field} has been updated successfully.`,
-          });
-          return;
-        }
-        const parentData = profileData[parent as keyof typeof profileData];
-        if (!parent || !child) throw new Error("Invalid field path");
-        if (parentData && typeof parentData === 'object') {
-          updateProfile({ 
-            [parent]: { 
-              ...parentData,
-              [child]: value.trim() 
-            } 
-          });
-        }
-      } else {
-        updateProfile({ [field]: value.trim() });
-      }
-      toast({
-        title: "Profile Updated",
-        description: `${field} has been updated successfully.`,
-      });
-    } catch (error) {
-      toast({
-        title: "Update Failed",
-        description: error instanceof Error ? error.message : "Failed to update profile",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleAddProject = async () => {
-    try {
-      // Validate required fields
-      if (!newProject.title.trim()) throw new Error("Title is required");
-      if (!newProject.description.trim()) throw new Error("Description is required");
-      if (!newProject.videoUrl.trim()) throw new Error("Video URL is required");
-
-      // Validate video URL
-      const videoValidation = validateVideoUrl(newProject.videoUrl);
-      if (!videoValidation.isValid) {
-        throw new Error("Invalid video URL. Please enter a valid YouTube or Vimeo URL");
-      }
-
-      const project: Project = {
-        ...newProject,
-        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        tags: newProject.tags.split(",")
-          .map(tag => tag.trim())
-          .filter(tag => tag.length > 0),
-        videoType: videoValidation.type as "youtube" | "vimeo",
-        youtubeId: videoValidation.id
-      };
-
-      // Await addProject if it returns a Promise, otherwise just call it
-      await Promise.resolve(addProject(project));
-
-      toast({
-        title: "Success",
-        description: "Project added successfully",
-      });
-
-      // Reset form
-      setNewProject({
-        title: "",
-        description: "",
-        category: "",
-        videoUrl: "",
-        thumbnail: "",
-        tags: "",
-        type: "long",
-        videoType: "youtube",
-        youtubeId: ""
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to add project",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDeleteProject = async (id: string, type: "long" | "short") => {
-    try {
-      if (!id || !type) throw new Error("Invalid project details");
+    if (field.includes('.')) {
+      const [parent, child] = field.split('.');
+      const parentData = profileData[parent as keyof typeof profileData];
       
-      await deleteProject(id, type);
-      toast({
-        title: "Success",
-        description: "Project deleted successfully",
-      });
-    } catch (error) {
+      // Type guard to ensure we're spreading an object
+      if (parentData && typeof parentData === 'object') {
+        updateProfile({ 
+          [parent]: { 
+            ...parentData,
+            [child]: value 
+          } 
+        });
+      }
+    } else {
+      updateProfile({ [field]: value });
+    }
+    toast({
+      title: "Profile Updated",
+      description: `${field} has been updated successfully.`,
+    });
+  };
+
+  const handleAddProject = () => {
+    if (!newProject.title || !newProject.description) {
       toast({
         title: "Error",
-        description: "Failed to delete project",
-        variant: "destructive"
+        description: "Please fill in title and description.",
+        variant: "destructive",
       });
+      return;
     }
+
+    const project = {
+      ...newProject,
+      id: Date.now().toString(),
+      tags: newProject.tags.split(",").map(tag => tag.trim()).filter(Boolean),
+    };
+
+    addProject(project);
+    
+    toast({
+      title: "Project Added",
+      description: "New project has been added to your portfolio.",
+    });
+
+    setNewProject({
+      title: "",
+      description: "",
+      category: "",
+      videoUrl: "",
+      thumbnail: "",
+      tags: "",
+      type: "long"
+    });
+  };
+
+  const handleDeleteProject = (id: string, type: "long" | "short") => {
+    deleteProject(id, type);
+    toast({
+      title: "Project Deleted",
+      description: "Project has been removed from your portfolio.",
+    });
   };
 
   return (
@@ -305,7 +182,7 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Instagram</label>
                   <Input
-                    value={socials.instagram}
+                    value={profileData.socials.instagram}
                     onChange={(e) => handleProfileUpdate("socials.instagram", e.target.value)}
                     className="bg-gray-800 border-gray-600"
                     placeholder="https://instagram.com/username"
@@ -314,7 +191,7 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Twitter</label>
                   <Input
-                    value={socials.twitter}
+                    value={profileData.socials.twitter}
                     onChange={(e) => handleProfileUpdate("socials.twitter", e.target.value)}
                     className="bg-gray-800 border-gray-600"
                     placeholder="https://twitter.com/username"
@@ -323,7 +200,7 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
                 <div>
                   <label className="block text-sm font-medium mb-2">LinkedIn</label>
                   <Input
-                    value={socials.linkedin}
+                    value={profileData.socials.linkedin}
                     onChange={(e) => handleProfileUpdate("socials.linkedin", e.target.value)}
                     className="bg-gray-800 border-gray-600"
                     placeholder="https://linkedin.com/in/username"
@@ -367,21 +244,12 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Video URL <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium mb-2">Video URL</label>
                     <Input
                       value={newProject.videoUrl}
-                      onChange={(e) => {
-                        const url = e.target.value;
-                        setNewProject({
-                          ...newProject,
-                          videoUrl: url,
-                          videoType: url.includes('youtube.com') || url.includes('youtu.be') ? 'youtube' : 'vimeo',
-                          youtubeId: url.includes('youtube.com') || url.includes('youtu.be') ? extractYoutubeId(url) : ''
-                        });
-                      }}
+                      onChange={(e) => setNewProject({ ...newProject, videoUrl: e.target.value })}
                       className="bg-gray-700 border-gray-600"
-                      placeholder="YouTube or Vimeo URL"
-                      required
+                      placeholder="https://..."
                     />
                   </div>
                   <div>

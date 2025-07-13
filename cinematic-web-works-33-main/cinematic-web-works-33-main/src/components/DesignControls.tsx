@@ -1,9 +1,7 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { RotateCcw, Palette, Type, Layout, Image } from "lucide-react";
@@ -21,37 +19,64 @@ const DesignControls = () => {
   } = useDesignSettings();
 
   const [activeColorTab, setActiveColorTab] = useState("colors");
+  const [pendingSettings, setPendingSettings] = useState(settings);
 
-  const handleColorChange = (colorKey: string, value: string) => {
-    updateColorSettings({ [colorKey]: value });
-    toast({
-      title: "Color Updated",
-      description: `${colorKey} color has been changed.`,
+  // Keep pendingSettings in sync with settings when settings change externally (e.g. reset)
+  useEffect(() => {
+    setPendingSettings(settings);
+  }, [settings]);
+
+  // Apply theme/colors to the document root
+  const applyTheme = () => {
+    const root = document.documentElement;
+    const colorVars = pendingSettings.colors;
+    Object.entries(colorVars).forEach(([key, value]) => {
+      if (typeof value === "string") {
+        root.style.setProperty(`--${key}`, value);
+      }
     });
+    toast({
+      title: "Theme Applied",
+      description: "Your design changes have been applied to the website.",
+    });
+  };
+
+  // When user changes a color, update pendingSettings instead of settings directly
+  const handleColorChange = (colorKey: string, value: string) => {
+    setPendingSettings((prev: any) => ({
+      ...prev,
+      colors: { ...prev.colors, [colorKey]: value },
+    }));
   };
 
   const handleTypographyChange = (typographyKey: string, value: string) => {
-    updateTypographySettings({ [typographyKey]: value });
-    toast({
-      title: "Typography Updated",
-      description: `${typographyKey} has been changed.`,
-    });
+    setPendingSettings((prev: any) => ({
+      ...prev,
+      typography: { ...prev.typography, [typographyKey]: value },
+    }));
   };
 
   const handleLayoutChange = (layoutKey: string, value: string) => {
-    updateLayoutSettings({ [layoutKey]: value });
-    toast({
-      title: "Layout Updated",
-      description: `${layoutKey} has been changed.`,
-    });
+    setPendingSettings((prev: any) => ({
+      ...prev,
+      layout: { ...prev.layout, [layoutKey]: value },
+    }));
   };
 
   const handleMediaChange = (mediaKey: string, value: string) => {
-    updateMediaSettings({ [mediaKey]: value });
-    toast({
-      title: "Media Settings Updated",
-      description: `${mediaKey} has been changed.`,
-    });
+    setPendingSettings((prev: any) => ({
+      ...prev,
+      media: { ...prev.media, [mediaKey]: value },
+    }));
+  };
+
+  // When user clicks Apply, update the settings and apply theme
+  const handleApply = () => {
+    updateColorSettings(pendingSettings.colors);
+    updateTypographySettings(pendingSettings.typography);
+    updateLayoutSettings(pendingSettings.layout);
+    updateMediaSettings(pendingSettings.media);
+    applyTheme();
   };
 
   const handleReset = () => {
@@ -66,10 +91,15 @@ const DesignControls = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Design Settings</h3>
-        <Button onClick={handleReset} variant="outline" size="sm">
-          <RotateCcw className="h-4 w-4 mr-2" />
-          Reset to Defaults
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleApply} variant="default" size="sm">
+            Apply
+          </Button>
+          <Button onClick={handleReset} variant="outline" size="sm">
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset to Defaults
+          </Button>
+        </div>
       </div>
 
       <Tabs value={activeColorTab} onValueChange={setActiveColorTab} className="w-full">
@@ -100,15 +130,15 @@ const DesignControls = () => {
                 <Input
                   id="primary-color"
                   type="color"
-                  value={settings.colors.primary}
+                  value={pendingSettings.colors.primary}
                   onChange={(e) => handleColorChange("primary", e.target.value)}
                   className="w-16 h-10 p-1 bg-gray-800 border-gray-600"
                 />
                 <Input
-                  value={settings.colors.primary}
+                  value={pendingSettings.colors.primary}
                   onChange={(e) => handleColorChange("primary", e.target.value)}
                   className="bg-gray-800 border-gray-600"
-                  placeholder="rgb(99, 102, 241)"
+                  placeholder="rgba(23, 23, 35, 1)"
                 />
               </div>
             </div>
@@ -119,12 +149,12 @@ const DesignControls = () => {
                 <Input
                   id="secondary-color"
                   type="color"
-                  value={settings.colors.secondary}
+                  value={pendingSettings.colors.secondary}
                   onChange={(e) => handleColorChange("secondary", e.target.value)}
                   className="w-16 h-10 p-1 bg-gray-800 border-gray-600"
                 />
                 <Input
-                  value={settings.colors.secondary}
+                  value={pendingSettings.colors.secondary}
                   onChange={(e) => handleColorChange("secondary", e.target.value)}
                   className="bg-gray-800 border-gray-600"
                   placeholder="rgb(168, 85, 247)"
@@ -138,12 +168,12 @@ const DesignControls = () => {
                 <Input
                   id="accent-color"
                   type="color"
-                  value={settings.colors.accent}
+                  value={pendingSettings.colors.accent}
                   onChange={(e) => handleColorChange("accent", e.target.value)}
                   className="w-16 h-10 p-1 bg-gray-800 border-gray-600"
                 />
                 <Input
-                  value={settings.colors.accent}
+                  value={pendingSettings.colors.accent}
                   onChange={(e) => handleColorChange("accent", e.target.value)}
                   className="bg-gray-800 border-gray-600"
                   placeholder="rgb(236, 72, 153)"
@@ -157,12 +187,12 @@ const DesignControls = () => {
                 <Input
                   id="background-color"
                   type="color"
-                  value={settings.colors.background}
+                  value={pendingSettings.colors.background}
                   onChange={(e) => handleColorChange("background", e.target.value)}
                   className="w-16 h-10 p-1 bg-gray-800 border-gray-600"
                 />
                 <Input
-                  value={settings.colors.background}
+                  value={pendingSettings.colors.background}
                   onChange={(e) => handleColorChange("background", e.target.value)}
                   className="bg-gray-800 border-gray-600"
                   placeholder="rgb(17, 24, 39)"
@@ -176,12 +206,12 @@ const DesignControls = () => {
                 <Input
                   id="text-color"
                   type="color"
-                  value={settings.colors.text}
+                  value={pendingSettings.colors.text}
                   onChange={(e) => handleColorChange("text", e.target.value)}
                   className="w-16 h-10 p-1 bg-gray-800 border-gray-600"
                 />
                 <Input
-                  value={settings.colors.text}
+                  value={pendingSettings.colors.text}
                   onChange={(e) => handleColorChange("text", e.target.value)}
                   className="bg-gray-800 border-gray-600"
                   placeholder="rgb(255, 255, 255)"
@@ -197,7 +227,7 @@ const DesignControls = () => {
               <Label htmlFor="primary-font">Primary Font</Label>
               <Input
                 id="primary-font"
-                value={settings.typography.primaryFont}
+                value={pendingSettings.typography.primaryFont}
                 onChange={(e) => handleTypographyChange("primaryFont", e.target.value)}
                 className="bg-gray-800 border-gray-600"
                 placeholder="'Inter', sans-serif"
@@ -208,7 +238,7 @@ const DesignControls = () => {
               <Label htmlFor="font-size">Base Font Size</Label>
               <Input
                 id="font-size"
-                value={settings.typography.fontSize}
+                value={pendingSettings.typography.fontSize}
                 onChange={(e) => handleTypographyChange("fontSize", e.target.value)}
                 className="bg-gray-800 border-gray-600"
                 placeholder="16px"
@@ -219,7 +249,7 @@ const DesignControls = () => {
               <Label htmlFor="heading-size">Heading Size</Label>
               <Input
                 id="heading-size"
-                value={settings.typography.headingSize}
+                value={pendingSettings.typography.headingSize}
                 onChange={(e) => handleTypographyChange("headingSize", e.target.value)}
                 className="bg-gray-800 border-gray-600"
                 placeholder="2.25rem"
@@ -234,7 +264,7 @@ const DesignControls = () => {
               <Label htmlFor="container-width">Container Max Width</Label>
               <Input
                 id="container-width"
-                value={settings.layout.containerWidth}
+                value={pendingSettings.layout.containerWidth}
                 onChange={(e) => handleLayoutChange("containerWidth", e.target.value)}
                 className="bg-gray-800 border-gray-600"
                 placeholder="1280px"
@@ -245,7 +275,7 @@ const DesignControls = () => {
               <Label htmlFor="spacing">Default Spacing</Label>
               <Input
                 id="spacing"
-                value={settings.layout.spacing}
+                value={pendingSettings.layout.spacing}
                 onChange={(e) => handleLayoutChange("spacing", e.target.value)}
                 className="bg-gray-800 border-gray-600"
                 placeholder="2rem"
@@ -256,7 +286,7 @@ const DesignControls = () => {
               <Label htmlFor="border-radius">Border Radius</Label>
               <Input
                 id="border-radius"
-                value={settings.layout.borderRadius}
+                value={pendingSettings.layout.borderRadius}
                 onChange={(e) => handleLayoutChange("borderRadius", e.target.value)}
                 className="bg-gray-800 border-gray-600"
                 placeholder="1rem"
@@ -271,7 +301,7 @@ const DesignControls = () => {
               <Label htmlFor="default-video">Default Video URL</Label>
               <Input
                 id="default-video"
-                value={settings.media.defaultVideoUrl}
+                value={pendingSettings.media.defaultVideoUrl}
                 onChange={(e) => handleMediaChange("defaultVideoUrl", e.target.value)}
                 className="bg-gray-800 border-gray-600"
                 placeholder="https://example.com/video.mp4"
@@ -282,7 +312,7 @@ const DesignControls = () => {
               <Label htmlFor="default-thumbnail">Default Thumbnail URL</Label>
               <Input
                 id="default-thumbnail"
-                value={settings.media.defaultThumbnail}
+                value={pendingSettings.media.defaultThumbnail}
                 onChange={(e) => handleMediaChange("defaultThumbnail", e.target.value)}
                 className="bg-gray-800 border-gray-600"
                 placeholder="/placeholder.svg"
@@ -293,7 +323,7 @@ const DesignControls = () => {
               <Label htmlFor="placeholder-icon">Placeholder Icon</Label>
               <Input
                 id="placeholder-icon"
-                value={settings.media.placeholderIcon}
+                value={pendingSettings.media.placeholderIcon}
                 onChange={(e) => handleMediaChange("placeholderIcon", e.target.value)}
                 className="bg-gray-800 border-gray-600"
                 placeholder="🎥"
