@@ -230,7 +230,7 @@ const DesignControls = () => {
 			description: "All design settings have been reset to defaults.",
 		});
 	};
-
+         
 	const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		const idx = parseInt(e.target.value, 10);
 		const palette = themePalettes[idx]?.colors;

@@ -138,7 +138,7 @@ const Hero = () => {
         {/* Main Showreel */}
         <div className="mb-16">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-white mb-8">Featured Showreel</h2>
+            <h2 className="text-3xl font-bold text-center text-white mb-8">Showreel</h2>
             <div className="relative rounded-xl overflow-hidden shadow-2xl bg-gray-800">
               <YouTubePlayer
                 videoId="https://www.youtube.com/watch?v=-dr-wvPjGFo"
@@ -208,4 +208,4 @@ const Hero = () => {
 };
 
 export default Hero;
-            
+

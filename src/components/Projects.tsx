@@ -19,7 +19,7 @@ const Projects = () => {
 
         {/* Long Form Projects */}
         <div className="space-y-16">
-          <h3 className="text-3xl font-bold text-white mb-8">Long Form Content</h3>
+          <h3 className="text-5xl font-extrabold text-center mb-12 text-indigo-400 drop-shadow-lg">LONGFORM</h3>
           {longFormProjects.map((project, index) => (
             <div
               key={project.id}
@@ -133,7 +133,7 @@ const Projects = () => {
 
         {/* Short Form Projects */}
         <div className="space-y-16 mt-16">
-          <h3 className="text-3xl font-bold text-white mb-8">Short Form Content</h3>
+          <h3 className="text-5xl font-extrabold text-center mb-12 text-pink-400 drop-shadow-lg">SHORTFORM</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {shortFormProjects.map((project) => (
               <div

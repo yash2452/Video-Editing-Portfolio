@@ -99,8 +99,8 @@ export const ProjectsSection: React.FC = () => {
         {/* Long Form Section */}
         <div className="mb-20">
           <div className="mb-12">
-            <h3 className="text-3xl font-bold mb-4 text-center lg:text-left">
-              Long Form Content
+            <h3 className="text-5xl font-extrabold text-center mb-6 text-indigo-400 drop-shadow-lg">
+              Longform
             </h3>
             <p className="text-muted-foreground text-center lg:text-left">
               In-depth storytelling and comprehensive video productions
@@ -127,8 +127,8 @@ export const ProjectsSection: React.FC = () => {
         {/* Short Form Section */}
         <div>
           <div className="mb-12">
-            <h3 className="text-3xl font-bold mb-4 text-center lg:text-left">
-              Short Form Content
+            <h3 className="text-5xl font-extrabold text-center mb-6 text-pink-400 drop-shadow-lg">
+              Shortform
             </h3>
             <p className="text-muted-foreground text-center lg:text-left">
               Quick, impactful content optimized for social platforms

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +8,7 @@ import { X, Plus, Upload, Trash2, LogOut, Settings } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 import { useAuth } from "@/hooks/useAuth";
+import { useAnimationSettings } from "@/hooks/useAnimationSettings";
 import AnimationControls from "./AnimationControls";
 import DesignControls from "./DesignControls";
 
@@ -25,19 +26,47 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     addProject, 
     deleteProject 
   } = usePortfolioData();
+  const { settings: animationSettings, updateSettings: updateAnimationSettings } = useAnimationSettings();
 
-  const [activeTab, setActiveTab] = useState("profile");
-  const [newProject, setNewProject] = useState({
-    title: "",
-    description: "",
-    category: "",
-    videoUrl: "",
-    thumbnail: "",
-    tags: "",
-    type: "long" as "long" | "short",
-    videoType: "youtube" as "youtube" | "direct",
-    youtubeId: ""
-  });
+  // Draft state for animation settings
+  const [animationDraft, setAnimationDraft] = useState(animationSettings);
+  // Draft state for design settings
+  const [designDraft, setDesignDraft] = useState(null); // will be set by DesignControls
+
+  // Track if there are unsaved changes
+  const [hasUnsaved, setHasUnsaved] = useState(false);
+
+  // Sync drafts with global settings when settings change externally
+  useEffect(() => {
+    setAnimationDraft(animationSettings);
+  }, [animationSettings]);
+
+  // Handler for design draft changes (from DesignControls)
+  const handleDesignDraftChange = (draft: any) => {
+    setDesignDraft(draft);
+    setHasUnsaved(true);
+  };
+
+  // Handler for animation draft changes (from AnimationControls)
+  const handleAnimationDraftChange = (draft: any) => {
+    setAnimationDraft(draft);
+    setHasUnsaved(true);
+  };
+
+  // Handler for Apply button
+  const handleApplyAll = () => {
+    // Apply animation settings
+    updateAnimationSettings(animationDraft);
+    // Apply design settings if available
+    if (designDraft && designDraft.applyAll) {
+      designDraft.applyAll();
+    }
+    setHasUnsaved(false);
+    toast({
+      title: "Settings Applied",
+      description: "All design and animation settings have been applied.",
+    });
+  };
 
   const handleLogout = () => {
     logout();
@@ -122,6 +151,15 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
           <div className="flex justify-between items-center">
             <DialogTitle className="text-2xl font-bold">Admin Panel</DialogTitle>
             <div className="flex gap-2">
+              {/* Universal Apply button */}
+              <Button
+                onClick={handleApplyAll}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                size="sm"
+                disabled={!hasUnsaved}
+              >
+                Apply
+              </Button>
               <Button onClick={handleLogout} variant="outline" size="sm">
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -358,11 +396,18 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
           </TabsContent>
 
           <TabsContent value="design" className="space-y-6">
-            <DesignControls />
+            <DesignControls
+              onDraftChange={handleDesignDraftChange}
+              externalApplySignal={hasUnsaved}
+              setApplyCallback={(applyFn: any) => setDesignDraft((prev: any) => ({ ...prev, applyAll: applyFn }))}
+            />
           </TabsContent>
 
           <TabsContent value="animations" className="space-y-6">
-            <AnimationControls />
+            <AnimationControls
+              draft={animationDraft}
+              setDraft={handleAnimationDraftChange}
+            />
           </TabsContent>
 
           <TabsContent value="media" className="space-y-6">
@@ -386,6 +431,11 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
           </TabsContent>
         </Tabs>
       </DialogContent>
+    </Dialog>
+  );
+};
+
+export default AdminPanel;
     </Dialog>
   );
 };

@@ -2,13 +2,22 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { RotateCcw, Palette, Type, Layout, Image } from "lucide-react";
 import { useDesignSettings } from "@/hooks/useDesignSettings";
 import { toast } from "@/hooks/use-toast";
 
-const DesignControls = () => {
+const DesignControls = ({
+	onDraftChange,
+	externalApplySignal,
+	setApplyCallback,
+}: {
+	onDraftChange?: (draft: any) => void,
+	externalApplySignal?: boolean,
+	setApplyCallback?: (applyFn: () => void) => void,
+}) => {
   const {
     settings,
     updateColorSettings,
@@ -31,6 +40,7 @@ const DesignControls = () => {
     const root = document.documentElement;
     const colorVars = pendingSettings.colors;
     Object.entries(colorVars).forEach(([key, value]) => {
+      // Only apply if value is a string
       if (typeof value === "string") {
         root.style.setProperty(`--${key}`, value);
       }
@@ -55,14 +65,12 @@ const DesignControls = () => {
       typography: { ...prev.typography, [typographyKey]: value },
     }));
   };
-
   const handleLayoutChange = (layoutKey: string, value: string) => {
     setPendingSettings((prev: any) => ({
       ...prev,
       layout: { ...prev.layout, [layoutKey]: value },
     }));
   };
-
   const handleMediaChange = (mediaKey: string, value: string) => {
     setPendingSettings((prev: any) => ({
       ...prev,
@@ -87,14 +95,27 @@ const DesignControls = () => {
     });
   };
 
+  // Expose applyAll to parent
+	useEffect(() => {
+		if (setApplyCallback) {
+			setApplyCallback(handleApply);
+		}
+		// eslint-disable-next-line
+	}, [draft]);
+
+	// Notify parent of draft changes
+	useEffect(() => {
+		if (onDraftChange) {
+			onDraftChange(draft);
+		}
+		// eslint-disable-next-line
+	}, [draft]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Design Settings</h3>
         <div className="flex gap-2">
-          <Button onClick={handleApply} variant="default" size="sm">
-            Apply
-          </Button>
           <Button onClick={handleReset} variant="outline" size="sm">
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset to Defaults
@@ -138,7 +159,7 @@ const DesignControls = () => {
                   value={pendingSettings.colors.primary}
                   onChange={(e) => handleColorChange("primary", e.target.value)}
                   className="bg-gray-800 border-gray-600"
-                  placeholder="rgba(23, 23, 35, 1)"
+                  placeholder="rgb(99, 102, 241)"
                 />
               </div>
             </div>
