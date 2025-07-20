@@ -35,7 +35,7 @@ export const useAnimationSettings = () => {
     }
   }, []);
 
-  const updateSettings = (newSettings: Partial<AnimationSettings>) => {
+  const updateSettings = (newSettings: Partial<AnimationSettings> | AnimationSettings) => {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
     localStorage.setItem('animation-settings', JSON.stringify(updated));

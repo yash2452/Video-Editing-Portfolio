@@ -8,6 +8,8 @@ import { X, Plus, Upload, Trash2, LogOut, Settings } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { usePortfolioData } from "@/hooks/usePortfolioData";
 import { useAuth } from "@/hooks/useAuth";
+import { useAnimationSettings } from "@/hooks/useAnimationSettings";
+import { useDesignSettings } from "@/hooks/useDesignSettings";
 import AnimationControls from "./AnimationControls";
 import DesignControls from "./DesignControls";
 
@@ -25,18 +27,62 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
     addProject, 
     deleteProject 
   } = usePortfolioData();
+  const { settings: animationSettings, updateSettings: updateAnimationSettings } = useAnimationSettings();
+  const { settings: designSettings, updateSettings: updateDesignSettings } = useDesignSettings();
 
   const [activeTab, setActiveTab] = useState("profile");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [animationDraft, setAnimationDraft] = useState(animationSettings);
+  const [designDraft, setDesignDraft] = useState(designSettings);
   const [newProject, setNewProject] = useState({
     title: "",
     description: "",
     category: "",
     videoUrl: "",
+    youtubeId: "",
+    videoType: "youtube" as "youtube" | "direct",
     thumbnail: "",
     tags: "",
     type: "long" as "long" | "short"
   });
 
+  // Sync drafts with current settings
+  useEffect(() => {
+    setAnimationDraft(animationSettings);
+  }, [animationSettings]);
+
+  useEffect(() => {
+    setDesignDraft(designSettings);
+  }, [designSettings]);
+
+  // Check for unsaved changes
+  useEffect(() => {
+    const animationChanged = JSON.stringify(animationDraft) !== JSON.stringify(animationSettings);
+    const designChanged = JSON.stringify(designDraft) !== JSON.stringify(designSettings);
+    setHasUnsavedChanges(animationChanged || designChanged);
+  }, [animationDraft, designDraft, animationSettings, designSettings]);
+
+  const handleApplyAllChanges = () => {
+    // Apply animation settings
+    updateAnimationSettings(animationDraft);
+    
+    // Apply design settings
+    updateDesignSettings(designDraft);
+    
+    // Apply theme colors to CSS variables
+    const root = document.documentElement;
+    Object.entries(designDraft.colors).forEach(([key, value]) => {
+      if (typeof value === "string") {
+        root.style.setProperty(`--${key}`, value);
+      }
+    });
+    
+    setHasUnsavedChanges(false);
+    toast({
+      title: "Settings Applied",
+      description: "All changes have been applied successfully!",
+    });
+  };
   const handleLogout = () => {
     logout();
     toast({
@@ -97,6 +143,8 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
       description: "",
       category: "",
       videoUrl: "",
+      youtubeId: "",
+      videoType: "youtube",
       thumbnail: "",
       tags: "",
       type: "long"
@@ -118,6 +166,14 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
           <div className="flex justify-between items-center">
             <DialogTitle className="text-2xl font-bold">Admin Panel</DialogTitle>
             <div className="flex gap-2">
+              <Button 
+                onClick={handleApplyAllChanges}
+                disabled={!hasUnsavedChanges}
+                className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50"
+                size="sm"
+              >
+                Apply All Changes
+              </Button>
               <Button onClick={handleLogout} variant="outline" size="sm">
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -128,7 +184,12 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
             </div>
           </div>
           <DialogDescription>
-            Manage your portfolio content, design, animations, and media settings
+            Manage your portfolio content, design, animations, and media settings. Changes are applied when you click "Apply All Changes".
+            {hasUnsavedChanges && (
+              <span className="text-yellow-400 block mt-1">
+                ⚠️ You have unsaved changes
+              </span>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -333,11 +394,17 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
           </TabsContent>
 
           <TabsContent value="design" className="space-y-6">
-            <DesignControls />
+            <DesignControls 
+              draft={designDraft}
+              setDraft={setDesignDraft}
+            />
           </TabsContent>
 
           <TabsContent value="animations" className="space-y-6">
-            <AnimationControls />
+            <AnimationControls 
+              draft={animationDraft}
+              setDraft={setAnimationDraft}
+            />
           </TabsContent>
 
           <TabsContent value="media" className="space-y-6">

@@ -61,10 +61,20 @@ export const useDesignSettings = () => {
     }
   }, []);
 
-  const updateSettings = (newSettings: Partial<DesignSettings>) => {
+  const updateSettings = (newSettings: Partial<DesignSettings> | DesignSettings) => {
     const updatedSettings = { ...settings, ...newSettings };
     setSettings(updatedSettings);
     localStorage.setItem('design-settings', JSON.stringify(updatedSettings));
+    
+    // Apply colors to CSS variables immediately
+    if ('colors' in newSettings && newSettings.colors) {
+      const root = document.documentElement;
+      Object.entries(newSettings.colors).forEach(([key, value]) => {
+        if (typeof value === "string") {
+          root.style.setProperty(`--${key}`, value);
+        }
+      });
+    }
   };
 
   const updateColorSettings = (colors: Partial<DesignSettings['colors']>) => {
@@ -86,6 +96,12 @@ export const useDesignSettings = () => {
   const resetToDefaults = () => {
     setSettings(DEFAULT_SETTINGS);
     localStorage.removeItem('design-settings');
+    
+    // Reset CSS variables to defaults
+    const root = document.documentElement;
+    Object.entries(DEFAULT_SETTINGS.colors).forEach(([key, value]) => {
+      root.style.setProperty(`--${key}`, value);
+    });
   };
 
   return {

@@ -18,9 +18,6 @@ const themePalettes = [
 			accent: "#ec4899",
 			background: "#111827",
 			text: "#ffffff",
-			tab: "#23272f",
-			tabBlur: "rgba(35,39,47,0.7)",
-			tabBorder: "#23272f",
 		},
 	},
 	{
@@ -31,9 +28,6 @@ const themePalettes = [
 			accent: "#2563eb",
 			background: "#0a0a0a",
 			text: "#e0e7ef",
-			tab: "#23272f",
-			tabBlur: "rgba(35,39,47,0.7)",
-			tabBorder: "#23272f",
 		},
 	},
 	{
@@ -44,9 +38,6 @@ const themePalettes = [
 			accent: "#f472b6",
 			background: "#18122B",
 			text: "#f3e8ff",
-			tab: "#2d1e4a",
-			tabBlur: "rgba(45,30,74,0.7)",
-			tabBorder: "#2d1e4a",
 		},
 	},
 	{
@@ -57,9 +48,6 @@ const themePalettes = [
 			accent: "#f59e42",
 			background: "#f9fafb",
 			text: "#22223b",
-			tab: "#e5e7eb",
-			tabBlur: "rgba(229,231,235,0.7)",
-			tabBorder: "#e5e7eb",
 		},
 	},
 	{
@@ -70,9 +58,6 @@ const themePalettes = [
 			accent: "#fbbf24",
 			background: "#0f172a",
 			text: "#e0f2fe",
-			tab: "#1e293b",
-			tabBlur: "rgba(30,41,59,0.7)",
-			tabBorder: "#1e293b",
 		},
 	},
 	{
@@ -83,9 +68,6 @@ const themePalettes = [
 			accent: "#f59e42",
 			background: "#052e16",
 			text: "#d1fae5",
-			tab: "#14532d",
-			tabBlur: "rgba(20,83,45,0.7)",
-			tabBorder: "#14532d",
 		},
 	},
 	{
@@ -96,9 +78,6 @@ const themePalettes = [
 			accent: "#fbbf24",
 			background: "#1e293b",
 			text: "#fff7ed",
-			tab: "#be185d",
-			tabBlur: "rgba(190,24,93,0.7)",
-			tabBorder: "#be185d",
 		},
 	},
 	{
@@ -109,9 +88,6 @@ const themePalettes = [
 			accent: "#a3be8c",
 			background: "#2e3440",
 			text: "#eceff4",
-			tab: "#3b4252",
-			tabBlur: "rgba(59,66,82,0.7)",
-			tabBorder: "#3b4252",
 		},
 	},
 	{
@@ -122,9 +98,6 @@ const themePalettes = [
 			accent: "#f6e3e1",
 			background: "#2d2424",
 			text: "#fff1f1",
-			tab: "#7e5a5a",
-			tabBlur: "rgba(126,90,90,0.7)",
-			tabBorder: "#7e5a5a",
 		},
 	},
 	{
@@ -135,9 +108,6 @@ const themePalettes = [
 			accent: "#fff700",
 			background: "#18181b",
 			text: "#f3f4f6",
-			tab: "#23272f",
-			tabBlur: "rgba(35,39,47,0.7)",
-			tabBorder: "#23272f",
 		},
 	},
 	{
@@ -148,9 +118,6 @@ const themePalettes = [
 			accent: "#e6ccb2",
 			background: "#3e2723",
 			text: "#f5f5dc",
-			tab: "#4e342e",
-			tabBlur: "rgba(78,52,46,0.7)",
-			tabBorder: "#4e342e",
 		},
 	},
 	{
@@ -161,38 +128,22 @@ const themePalettes = [
 			accent: "#ffd700",
 			background: "#22223b",
 			text: "#f8f8ff",
-			tab: "#232972",
-			tabBlur: "rgba(35,41,114,0.7)",
-			tabBorder: "#232972",
 		},
 	},
 ];
 
-const DesignControls = () => {
+const DesignControls = ({
+	draft,
+	setDraft,
+}: {
+	draft: any;
+	setDraft: (draft: any) => void;
+}) => {
 	const {
-		settings,
-		updateColorSettings,
-		updateTypographySettings,
-		updateLayoutSettings,
-		updateMediaSettings,
 		resetToDefaults,
 	} = useDesignSettings();
 
-	// Local draft state for settings
-	const [draft, setDraft] = useState(settings);
 	const [activeColorTab, setActiveColorTab] = useState("colors");
-	const [hasChanges, setHasChanges] = useState(false);
-
-	// Sync draft with global settings when settings change externally
-	useEffect(() => {
-		setDraft(settings);
-		setHasChanges(false);
-	}, [settings]);
-
-	// Compare draft and settings to enable/disable Apply button
-	useEffect(() => {
-		setHasChanges(JSON.stringify(draft) !== JSON.stringify(settings));
-	}, [draft, settings]);
 
 	// Handlers update draft only
 	const handleColorChange = (colorKey: string, value: string) => {
@@ -225,9 +176,30 @@ const DesignControls = () => {
 
 	const handleReset = () => {
 		resetToDefaults();
-		toast({
-			title: "Settings Reset",
-			description: "All design settings have been reset to defaults.",
+		// Reset draft to defaults
+		setDraft({
+			colors: {
+				primary: "rgb(99, 102, 241)",
+				secondary: "rgb(168, 85, 247)",
+				accent: "rgb(236, 72, 153)",
+				background: "rgb(17, 24, 39)",
+				text: "rgb(255, 255, 255)",
+			},
+			typography: {
+				primaryFont: "'Inter', sans-serif",
+				fontSize: "16px",
+				headingSize: "2.25rem",
+			},
+			layout: {
+				containerWidth: "1280px",
+				spacing: "2rem",
+				borderRadius: "1rem",
+			},
+			media: {
+				defaultVideoUrl: "",
+				defaultThumbnail: "/placeholder.svg",
+				placeholderIcon: "🎥",
+			},
 		});
 	};
          
@@ -244,29 +216,11 @@ const DesignControls = () => {
 					accent: palette.accent,
 					background: palette.background,
 					text: palette.text,
-					tab: palette.tab,
-					tabBlur: palette.tabBlur,
-					tabBorder: palette.tabBorder,
 				},
 			}));
-			toast({
-				title: "Theme Changed",
-				description: `Theme set to "${themePalettes[idx].name}" (not applied yet)`,
-			});
 		}
 	};
 
-	// Apply button handler
-	const handleApply = () => {
-		updateColorSettings(draft.colors);
-		updateTypographySettings(draft.typography);
-		updateLayoutSettings(draft.layout);
-		updateMediaSettings(draft.media);
-		toast({
-			title: "Design Applied",
-			description: "Your design changes have been applied.",
-		});
-	};
 
 	return (
 		<div className="space-y-6">
@@ -301,15 +255,6 @@ const DesignControls = () => {
 			<div className="flex justify-between items-center">
 				<h3 className="text-lg font-semibold">Design Settings</h3>
 				<div className="flex gap-2">
-					<Button
-						onClick={handleApply}
-						variant="default"
-						size="sm"
-						disabled={!hasChanges}
-						className="bg-indigo-600 hover:bg-indigo-700 text-white"
-					>
-						Apply
-					</Button>
 					<Button onClick={handleReset} variant="outline" size="sm">
 						<RotateCcw className="h-4 w-4 mr-2" />
 						Reset to Defaults
